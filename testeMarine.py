@@ -37,33 +37,34 @@ depthIni.send_keys("0,49402")
 depthFin = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.ID, "_l1-elevationMin")))
 depthFin.send_keys("0,49402")
 
-#Ler o CSV e fazer o loop de download
+#criar função de limpar e digitar no campo
+def limpar_e_digita_campo(elemento, valor):
+    elemento.send_keys(Keys.CONTROL + 'a')
+    elemento.send_keys(Keys.DELETE)
+    elemento.send_keys(valor)
+
+#ler o CSV e fazer o loop de download
 with open(caminho_csv, mode='r', encoding='utf-8') as arquivo:
     leitorCsv = csv.reader(arquivo, delimiter=';')
     cabecalho = next(leitorCsv)
     for linha in leitorCsv:
-        #identificar os campos
-        cordNorth = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.ID, "_l1-latMax")))
-        cordSouth = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.ID, "_l1-latMin")))
-        cordWest = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.ID, "_l1-lonMin")))
-        cordEast = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.ID, "_l1-lonMax")))
-        #escrever as coordenadas nos campos
-        cordNorth.send_keys(Keys.CONTROL + 'a')
-        cordNorth.send_keys(Keys.DELETE)
-        cordNorth.send_keys(linha[0])
-        cordSouth.send_keys(Keys.CONTROL + 'a')
-        cordSouth.send_keys(Keys.DELETE)
-        cordSouth.send_keys(linha[0])
-        cordWest.send_keys(Keys.CONTROL + 'a')
-        cordWest.send_keys(Keys.DELETE)
-        cordWest.send_keys (linha[1])
-        cordEast.send_keys(Keys.CONTROL + 'a')
-        cordEast.send_keys(Keys.DELETE)
-        cordEast.send_keys (linha[1])
-        time.sleep(5)
-        clicarDownload = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='__next']/main/div/div[4]/div[2]/div/div/div[5]/div/div[5]/div[2]/div[2]")))
-        clicarDownload.click()
-        time.sleep(25)
+        try:
+            #identificar os campos
+            cordNorth = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.ID, "_l1-latMax")))
+            cordSouth = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.ID, "_l1-latMin")))
+            cordWest = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.ID, "_l1-lonMin")))
+            cordEast = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.ID, "_l1-lonMax")))
+            #escrever as coordenadas nos campos
+            limpar_e_digita_campo(cordNorth, linha[0])
+            limpar_e_digita_campo(cordSouth, linha[0])
+            limpar_e_digita_campo(cordWest, linha[1])
+            limpar_e_digita_campo(cordEast, linha[1])
+            time.sleep(5)
+            clicarDownload = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='__next']/main/div/div[4]/div[2]/div/div/div[5]/div/div[5]/div[2]/div[2]")))
+            clicarDownload.click()
+            time.sleep(25)
+        except Exception as e:
+            print(f"Erro ao processar a linha: {linha}. Erro: {e}")
 
 print(f"Valide se tudo foi baixado corretamente!")
 #Caso tu queira que o robô espere para fechar o navegador, irá fechar após você apertar Enter
